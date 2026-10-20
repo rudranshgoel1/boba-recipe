@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>boba recipe thing</title>
+    <link rel="icon" href="https://assets.hackclub.com/favicons/favicon.png">
+    <style>
+        :root {
+            --hc-red: #ec3750;
+            --hc-dark: #252429;
+            --hc-bg: #f5f5f7;
+            --hc-card: #ffffff;
+            --hc-border: #d3d3d7;
+            --hc-muted: #6b6e76;
+            --hc-yellow: #f1c40f;
+        }
+
+        body {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            background-color: var(--hc-bg);
+            color: var(--hc-dark);
+            margin: 0;
+            padding: 100px 20px 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 640px;
+            width: 100%;
+        }
+
+        /* Hack Club Flag positioning */
+        .hc-flag {
+            position: absolute;
+            top: 0;
+            left: 10px;
+            border: 0;
+            width: 256px;
+            z-index: 999;
+        }
+
+        header {
+            margin-bottom: 2rem;
+            border-bottom: 3px dashed var(--hc-dark);
+            padding-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            color: var(--hc-red);
+            margin: 0 0 8px 0;
+            letter-spacing: -1px;
+            font-weight: 900;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: var(--hc-muted);
+            margin: 0;
+        }
+
+        .card {
+            background: var(--hc-card);
+            border: 3px solid var(--hc-dark);
+            border-radius: 6px;
+            padding: 24px;
+            box-shadow: 4px 4px 0px 0px var(--hc-dark);
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        input[type="number"] {
+            font-family: inherit;
+            padding: 12px;
+            border: 2px solid var(--hc-dark);
+            border-radius: 4px;
+            font-size: 1.1rem;
+            background: var(--hc-bg);
+            outline: none;
+        }
+
+        input[type="number"]:focus {
+            background: #fff;
+            border-color: var(--hc-red);
+        }
+
+        .recipe-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border-top: 2px solid var(--hc-border);
+        }
+
+        .recipe-item {
+            padding: 14px 0;
+            border-bottom: 1px solid var(--hc-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1rem;
+        }
+
+        .recipe-item span:last-child {
+            font-weight: 700;
+            color: var(--hc-red);
+            background: #fdf2f4;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #f9d8de;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .event-card {
+            background: var(--hc-bg);
+            border: 2px solid var(--hc-dark);
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .event-card strong {
+            display: block;
+            color: var(--hc-red);
+            margin-bottom: 4px;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--hc-muted);
+            margin-top: 2rem;
+        }
+
+        footer a {
+            color: var(--hc-red);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Required Hack Club Flag -->
+    <a href="https://hackclub.com/">
+        <img class="hc-flag" src="https://assets.hackclub.com/flag-orpheus-top.svg" alt="Hack Club"/>
+    </a>
+
+    <div class="container">
+        <header>
+            <h1>boba recipe thing<h1>
+        </header>
+
+        <div class="card">
+            <div class="input-group">
+                <label for="servings">Cups of Boba to Brew:</label>
+                <input type="number" id="servings" value="1" min="1" max="100" oninput="renderRecipe()">
+            </div>
+
+            <ul class="recipe-list" id="recipeList">
+                <!-- Dynamically populated -->
+            </ul>
+        </div>
+
+
+        <footer>
+            made with ‪‪❤︎‬ by rudransh goel (stolen_username)
+        </footer>
+    </div>
+
+    <script>
+        const ingredients = [
+            { name: "Tapioca Pearls (Boba)", base: 0.25, unit: "cup" },
+            { name: "Black Tea Bags", base: 2, unit: "bags" },
+            { name: "Hot Water (Steeping)", base: 0.5, unit: "cup" },
+            { name: "Milk / Creamer", base: 0.5, unit: "cup" },
+            { name: "Brown Sugar (Syrup)", base: 2, unit: "tbsp" },
+            { name: "Ice Cubes", base: 1, unit: "handful" }
+        ];
+
+        function renderRecipe() {
+            let count = parseInt(document.getElementById('servings').value);
+            if (isNaN(count) || count < 1) count = 1;
+
+            const list = document.getElementById('recipeList');
+            list.innerHTML = '';
+
+            ingredients.forEach(item => {
+                let total = item.base * count;
+                let displayVal = total;
+
+                if (item.unit !== "bags" && item.unit !== "handful") {
+                    if (total === 0.25) displayVal = "1/4";
+                    else if (total === 0.5) displayVal = "1/2";
+                    else if (total === 0.75) displayVal = "3/4";
+                    else if (total === 1.5) displayVal = "1 ½";
+                    else if (total === 2.25) displayVal = "2 ¼";
+                    else if (total === 2.5) displayVal = "2 ½";
+                    else displayVal = Number(total.toFixed(2));
+                } else {
+                    displayVal = Math.round(total);
+                }
+
+                const li = document.createElement('li');
+                li.className = 'recipe-item';
+                li.innerHTML = `<span>${item.name}</span><span>${displayVal} ${item.unit}</span>`;
+                list.appendChild(li);
+            });
+        }
+
+        renderRecipe();
+    </script>
+</body>
+</html>
